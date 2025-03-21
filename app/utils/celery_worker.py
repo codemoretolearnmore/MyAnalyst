@@ -8,4 +8,9 @@ celery = Celery(
     include=["app.services.workflow"]
 )
 
-celery.conf.update(task_serializer="json")
+# Correct way to set heartbeat interval
+celery.conf.update(
+    task_serializer="json",
+    worker_heartbeat=300  # Set heartbeat every 5 minutes
+)
+celery.conf.broker_use_ssl = {"ssl_cert_reqs": "CERT_REQUIRED"}

@@ -7,8 +7,6 @@ services:
       - "8000:8000"
     depends_on:
       - mongo
-      - kafka
-      - redis
       - celery_worker
     env_file:
       - .env
@@ -17,34 +15,25 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
-
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    environment:
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    ports:
-      - "2181:2181"
-
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
+    volumes:
+      - mongo_data:/data/db
+    # Only needed if you want to use local MongoDB. Remove if using Atlas.
 
   celery_worker:
     build: .
-    command: celery -A app.tasks.process_tasks worker --loglevel=info
+    command: celery -A app.tasks.process_tasks worker --loglevel=info --pool=solo
     depends_on:
-      - redis
       - app
     env_file:
       - .env
+
+  kafka_consumer:
+    build: .
+    command: python -m app.utils.kafka_consumer
+    depends_on:
+      - app
+    env_file:
+      - .env
+
+volumes:
+  mongo_data:

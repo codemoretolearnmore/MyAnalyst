@@ -21,6 +21,14 @@ KAFKA_TOPICS = {
     "INSIGHTS_CREATED": "insights_created"
 }
 
+KAFKA_CONFIG = {
+    "bootstrap.servers": "cve5b9gt5iv26e6990q0.any.us-east-1.mpx.prd.cloud.redpanda.com:9092",
+    "security.protocol": "SASL_SSL",  # Required for Redpanda Cloud
+    "sasl.mechanisms": "SCRAM-SHA-256",
+    "sasl.username": "connect",
+    "sasl.password": "connect",
+}
+
 # Celery Configuration
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
 CELERY_BACKEND_URL = os.getenv("CELERY_BACKEND_URL", "redis://localhost:6379/0")
